@@ -20,6 +20,14 @@ namespace OpenAuth.AuthSub
         private string urlScope = "http://www.google.com/m8/feeds/";
         private string urlData = "http://www.google.com/m8/feeds/contacts/default/thin?max-results=0";
 
+        public Gmail()
+        {
+        }
+
+        public Gmail(System.Xml.XmlNode node, string UserID)
+        {
+        }
+
         /// <summary>
         /// 生成登录的URL
         /// </summary>
@@ -53,10 +61,8 @@ namespace OpenAuth.AuthSub
                 XmlNode node = doc.SelectSingleNode("*/*[local-name()='id']");
                 string account = node != null ? node.InnerText : "";
 
-                //读取用户昵称
-                node = doc.SelectSingleNode("*/*[local-name()='author']/*[local-name()='name']");
-                string name = node != null ? node.InnerText : "";
-                setUserInfo(account, name, name);
+                Token.UserID = account;
+                Token.Service = name;;
             }
         }
     }

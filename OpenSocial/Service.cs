@@ -9,27 +9,34 @@ using System.Xml;
 
 namespace OpenAuth.OpenSocial
 {
-    public class GS : Base
+    public class Default : Base
     {
         public static string name = "opensocial";
 
-        private string loginUrl;
-
-        public GS( string url )
+        public Default()
         {
-            loginUrl = url;
+        }
+
+        public Default( System.Xml.XmlNode node, string UserID )
+        {
+        }
+
+        protected virtual string getLoginUrl()
+        {
+            System.Diagnostics.Debug.Assert(false);
+            return "";
         }
 
         public override string getLoginUrl(string next )//直接将XML配置之中的登录URL返回
         {
-            return loginUrl; 
+            return getLoginUrl(); 
         }
         public override void parseHandle(HttpContext page)//处理回转请求
         {
             System.Collections.Specialized.NameValueCollection request = HttpUtility.ParseQueryString(page.Request.Url.Query, Encoding.UTF8);
             string id = request["id"];
-            string name = request["name"];
-            setUserInfo(id, name, name);//设置用户的Cookie
+            Token.UserID = id;
+            Token.Service = name;
         }
     }
 }
