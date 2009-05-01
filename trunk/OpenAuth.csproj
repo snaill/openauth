@@ -8,8 +8,8 @@
     <ProjectGuid>{951F3D57-8004-46E5-81D5-57E0A7D51019}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AuthService</RootNamespace>
-    <AssemblyName>AuthService</AssemblyName>
+    <RootNamespace>OpenAuth</RootNamespace>
+    <AssemblyName>OpenAuth</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -54,12 +54,19 @@
   <ItemGroup>
     <Compile Include="AuthSub\Gmail.cs" />
     <Compile Include="BaseService.cs" />
+    <Compile Include="Helper\AuthCreator.cs" />
+    <Compile Include="Helper\HomePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Helper\Login.cs" />
     <Compile Include="Libs\WindowsLiveLogin.cs" />
     <Compile Include="LiveService.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Libs\OAuthBase.cs" />
     <Compile Include="OpenID\Service.cs" />
     <Compile Include="OpenSocial\Service.cs" />
+    <Compile Include="OpenSocial\Xiaonei.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

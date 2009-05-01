@@ -27,6 +27,12 @@ namespace OpenAuth
             secret = psw;
         }
 
+        public Live( System.Xml.XmlNode node, string UserID)
+        {
+           appid = node.Attributes["appid"].Value;
+           secret = node.Attributes["secret"].Value;
+        }
+
         public void createWLL()
         {
             wll = new WindowsLiveLogin(false);
@@ -90,23 +96,23 @@ namespace OpenAuth
                     //获取用户帐号
                     XmlNode node = doc.SelectSingleNode("Owner/WindowsLiveID");
                     string account = node != null ? node.InnerText : "";
-                    //获取用户的昵称
-                    node = doc.SelectSingleNode("Owner/Profiles/Personal/DisplayName");
-                    string nickName = node != null ? node.InnerText : "";
                     //设置用户信息到Cookie
-                    setUserInfo(account, nickName, name);
+                    Token.UserID = account;
+                    Token.Service = name;
                     break;
                 case "login"://这是Live接口要求定义支持的类型，系统之中没有主动使用这种请求
                     WindowsLiveLogin.User user = wll.ProcessLogin(page.Request.Form);//从URL参数之中解析出用户的登录信息
-                    setUserInfo(user.Id, user.Id, name);//这里的user.ID实际上已经是用户的E-mail
+                    //这里的user.ID实际上已经是用户的E-mail
+                    Token.UserID = user.Id;
+                    Token.Service = name;
                     page.Response.Redirect(wll.GetConsentUrl("Contacts.View", user.Token));
                     break;
                 case "logout"://这是Live接口要求定义支持的类型，系统之中没有主动使用这种请求
-                    clearCookie();
+                    Token.clear();
                     break;
                 case "clearcookie"://这是Live接口要求定义支持的类型，系统之中没有主动使用这种请求
                 default:
-                    clearCookie();
+                    Token.clear();
                     string type;
                     byte[] content;
                     wll.GetClearCookieResponse(out type, out content);

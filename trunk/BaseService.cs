@@ -9,70 +9,78 @@ using System.Collections.Specialized;
 
 namespace OpenAuth
 {
-    public abstract class Base
+    public class Token
     {
-        public static string cookieName = "OpenAuthCookie";
-        public static string cookieDomain = "jeebook.com";
+        public const string cookieName = "OpenAuth";
+        public static string cookieUserID = "UserID";
+        public static string cookieService = "Service";
 
-        public static string cookieAccount = "account";
-        public static string cookieNickname = "nickname";
-        public static string cookieService = "service";
-
-        //清除Cookie
-        public static void clearCookie()
-        {
-            HttpCookie loginCookie = new HttpCookie(cookieName);
-            // loginCookie.Expires = DateTime.Now.AddYears(-10);
-            loginCookie.Domain = cookieDomain;
-            loginCookie.HttpOnly = false;
-            HttpContext.Current.Response.Cookies.Add(loginCookie);
-        }
-
-        //将用户信息加入到Cookie
-        public static void setUserInfo(string account, string name, string service)
-        {
-            HttpCookie loginCookie = new HttpCookie(cookieName);
-            loginCookie.Domain = cookieDomain;
-            loginCookie.Values.Add(cookieAccount, Convert.ToBase64String(Encoding.UTF8.GetBytes(account)));
-            loginCookie.Values.Add(cookieNickname, Convert.ToBase64String(Encoding.UTF8.GetBytes(name)));
-            loginCookie.Values.Add(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes(service)));
-            //loginCookie.Expires = DateTime.Now.AddYears(1);
-            HttpContext.Current.Response.Cookies.Add(loginCookie);
-        }
-
-        //从Cookie之中获取用户信息
-        public static NameValueCollection getUserInfo()
+        protected static HttpCookie GetCookie()
         {
             HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieName];
-            if (cookie != null)
-            {
-                NameValueCollection userInfo = new NameValueCollection();
-                foreach (string key in cookie.Values)
-                {
-                    userInfo.Add(key, Encoding.UTF8.GetString(Convert.FromBase64String(cookie.Values[key])));
-                }
-                return userInfo.HasKeys() ? userInfo : null;
-            }
-            return null;
+            if (null != cookie)
+                return cookie;
+
+            cookie = new HttpCookie(cookieName);
+            cookie.Domain = HttpContext.Current.Request.Url.Host;
+            cookie.Values.Add(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes("unknown")));
+            HttpContext.Current.Response.Cookies.Add(cookie);
+            return cookie;
         }
 
-        public static string getUserName() {
-            NameValueCollection nv = getUserInfo();
-            if (null == nv)
-                return "";
-
-            return nv[cookieNickname];
-        }
-
-        public static string getService()
+        public static bool IsToken()
         {
-            NameValueCollection nv = getUserInfo();
-            if (null == nv)
-                return "";
-
-            return nv[cookieService];
+            return Token.UserID != "";
         }
 
+        public static string UserID
+        {
+            get
+            {
+                string account = GetCookie().Values[cookieUserID];
+                if ( null == account )
+                    return "";
+
+                return Encoding.UTF8.GetString( Convert.FromBase64String(account));
+            }
+            set
+            {
+                if (value == null || value == "")
+                    return;
+                GetCookie().Values.Set(cookieUserID, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+            }
+        }
+
+        public static string Service
+        {
+            get
+            {
+                string service = GetCookie().Values[cookieService];
+                if (null == service)
+                    return "";
+
+                return Encoding.UTF8.GetString(Convert.FromBase64String(service));
+            }
+            set
+            {
+                if (value == null || value == "")
+                    return;
+                GetCookie().Values.Set(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+            }
+        }
+
+        //清除Cookie
+        public static void clear()
+        {
+            HttpCookie cookie = new HttpCookie(cookieName);
+            cookie.Domain = HttpContext.Current.Request.Url.Host;
+            cookie.HttpOnly = false;
+            HttpContext.Current.Response.Cookies.Add(cookie);
+        }
+    }
+
+    public abstract class Base
+    {
         public HttpWebResponse getResponse(HttpWebRequest request)
         {
             try
@@ -88,6 +96,7 @@ namespace OpenAuth
             }
             return null;
         }
+
         public abstract string getLoginUrl(string nextUrl);
         public abstract void parseHandle( HttpContext page);
     }

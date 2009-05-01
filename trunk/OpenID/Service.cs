@@ -12,9 +12,20 @@ using ExtremeSwank.Authentication.OpenID.Plugins.Extensions;
 
 namespace OpenAuth.OpenID
 {
-    public class GS : Base
+    public class Default : Base
     {
         public static string name = "openid";
+        protected string openID = "";
+
+        public Default(string account)
+        {
+            openID = account;
+        }
+
+        public Default(System.Xml.XmlNode node, string UserID)
+        {
+            openID = UserID;
+        }
 
         public override string getLoginUrl(string nextUrl)//返回登录地址
         {
@@ -24,7 +35,7 @@ namespace OpenAuth.OpenID
             sr.AddRequiredFields(SimpleRegistrationFields.Nickname);//设置附加的字段列表
 
             openid.ReturnURL = nextUrl;
-            openid.Identity = HttpContext.Current.Request["openid_url"];
+            openid.Identity = openID;
             return openid.BeginAuth(false, false);//获得并返回登录地址
         }
 
@@ -51,7 +62,9 @@ namespace OpenAuth.OpenID
                         {
                             nickName = account;
                         }
-                        setUserInfo(account, nickName, name);
+
+                        Token.UserID = account;
+                        Token.Service = name;
                     }
                     break;
             }
