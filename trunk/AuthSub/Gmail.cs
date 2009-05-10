@@ -62,7 +62,7 @@ namespace OpenAuth.AuthSub
                 string account = node != null ? node.InnerText : "";
 
                 Token.UserID = account;
-                Token.Service = name;;
+                Token.Service = name;
             }
         }
     }

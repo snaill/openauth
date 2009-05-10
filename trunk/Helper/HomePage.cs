@@ -9,7 +9,7 @@ namespace OpenAuth.Helper
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if ( Token.IsToken() )
+            if ( !Token.IsToken() )
                 Response.Redirect("index.html");
 
             Response.Write("<div style=\"text-align:center\">" + Token.UserID + " | <a href=\"login.ashx?action=logout\">Sign out</a></div>");

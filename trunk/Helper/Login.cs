@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Web;
+using System.Web.SessionState;
 using OpenAuth;
 
 namespace OpenAuth.Helper
 {
-    public class Login : IHttpHandler
+    public class Login : IHttpHandler, IRequiresSessionState
     {
         public void ProcessRequest(HttpContext context)
         {

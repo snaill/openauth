@@ -11,22 +11,22 @@ namespace OpenAuth
 {
     public class Token
     {
-        public const string cookieName = "OpenAuth";
+//        public const string cookieName = "OpenAuth";
         public static string cookieUserID = "UserID";
         public static string cookieService = "Service";
 
-        protected static HttpCookie GetCookie()
-        {
-            HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieName];
-            if (null != cookie)
-                return cookie;
+        //protected static HttpCookie GetCookie()
+        //{
+        //    HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieName];
+        //    if (null != cookie)
+        //        return cookie;
 
-            cookie = new HttpCookie(cookieName);
-            cookie.Domain = HttpContext.Current.Request.Url.Host;
-            cookie.Values.Add(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes("unknown")));
-            HttpContext.Current.Response.Cookies.Add(cookie);
-            return cookie;
-        }
+        //    cookie = new HttpCookie(cookieName);
+        //    cookie.Domain = "www.jeebook.com";
+        //    cookie.Values.Add(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes("unknown")));
+        //    HttpContext.Current.Response.Cookies.Add(cookie);
+        //    return cookie;
+        //}
 
         public static bool IsToken()
         {
@@ -37,17 +37,21 @@ namespace OpenAuth
         {
             get
             {
-                string account = GetCookie().Values[cookieUserID];
-                if ( null == account )
+                HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieUserID];
+                if ( null == cookie )
                     return "";
 
-                return Encoding.UTF8.GetString( Convert.FromBase64String(account));
+                return Encoding.UTF8.GetString(Convert.FromBase64String(cookie.Value));
             }
             set
             {
                 if (value == null || value == "")
                     return;
-                GetCookie().Values.Set(cookieUserID, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+            //    GetCookie().Values.Set(cookieUserID, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+                HttpCookie cookie = new HttpCookie(cookieUserID, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+                cookie.Domain = "www.jeebook.com";
+                cookie.Expires = DateTime.Now.AddMinutes(30);
+                HttpContext.Current.Response.Cookies.Add(cookie);
             }
         }
 
@@ -55,27 +59,33 @@ namespace OpenAuth
         {
             get
             {
-                string service = GetCookie().Values[cookieService];
-                if (null == service)
+                HttpCookie cookie = HttpContext.Current.Request.Cookies[cookieService];
+                if (null == cookie)
                     return "";
 
-                return Encoding.UTF8.GetString(Convert.FromBase64String(service));
+                return Encoding.UTF8.GetString(Convert.FromBase64String(cookie.Value));
             }
             set
             {
                 if (value == null || value == "")
                     return;
-                GetCookie().Values.Set(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+ //               GetCookie().Values.Set(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+                HttpCookie cookie = new HttpCookie(cookieService, Convert.ToBase64String(Encoding.UTF8.GetBytes(value)));
+                cookie.Domain = "www.jeebook.com";
+                cookie.Expires = DateTime.Now.AddMinutes(30);
+                HttpContext.Current.Response.Cookies.Add(cookie);
             }
         }
 
         //Çå³ýCookie
         public static void clear()
         {
-            HttpCookie cookie = new HttpCookie(cookieName);
-            cookie.Domain = HttpContext.Current.Request.Url.Host;
-            cookie.HttpOnly = false;
-            HttpContext.Current.Response.Cookies.Add(cookie);
+            UserID = "";
+            Service = "";
+            //HttpCookie cookie = new HttpCookie(cookieName);
+            //cookie.Domain = HttpContext.Current.Request.Url.Host;
+            //cookie.HttpOnly = false;
+            //HttpContext.Current.Response.Cookies.Add(cookie);
         }
     }
 
